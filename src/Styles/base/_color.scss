@@ -6,7 +6,7 @@
 	@return unquote("hsl(#{$h}, #{$s}, #{$l})");
 }
 
-$colors: (
+$global-colors: (
 	surface: (
 		0: hsl(210, 11%, 2%),
 		1: hsl(210, 11%, 7%),
@@ -16,25 +16,48 @@ $colors: (
 	text: (
 		0: hsl(0, 0%, 95%),
 		1: hsl(0, 0%, 85%),
-		3: hsl(0, 0%, 70%),
+		2: hsl(0, 0%, 70%),
 	),
-	brand: (
-		0: hsl(0, 100%, 71%),
+	gaslur: (
+		0: hsl(249, 19%, 14%),
 	),
 );
 
-:root {
-	@each $color, $shades in $colors {
-		@each $shade, $clr in $shades {
-			$break-hsl: string.slice(
-				$string: $clr,
-				$start-at: 5,
-				$end-at: -2,
-			);
+$page-colors: (
+	gaslur: (
+		surface: (
+			0: hsl(249, 19%, 14%),
+		),
+		brand: (
+			0: hsl(271, 70%, 60%),
+			1: hsl(214, 84%, 56%),
+		),
+	),
+);
 
-			// @debug $clr, $break-hsl;
-			--clr-#{$color}-#{$shade}: #{$clr};
-			--clra-#{$color}-#{$shade}: #{$break-hsl};
+@function hsl-slice($hsl) {
+	$break-hsl: string.slice(
+		$string: $hsl,
+		$start-at: 5,
+		$end-at: -2,
+	);
+
+	@return $break-hsl;
+}
+:root {
+	@each $colors, $shades in $global-colors {
+		@each $shade, $color in $shades {
+			--clr-#{$colors}-#{$shade}: #{$color};
+			--clra-#{$colors}-#{$shade}: #{hsl-slice($color)};
+		}
+	}
+
+	@each $page, $types in $page-colors {
+		@each $type, $shades in $types {
+			@each $shade, $colors in $shades {
+				--#{$page}-#{$type}-#{$shade}: #{$colors};
+				--a-#{$page}-#{$type}-#{$shade}: #{hsl-slice($colors)};
+			}
 		}
 	}
 }

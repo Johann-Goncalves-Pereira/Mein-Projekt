@@ -1,0 +1,62 @@
+.root--home {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: "Fredoka", spotify-circular, spotify-circular-cyrillic, spotify-circular-arabic, spotify-circular-hebrew,
+		"Helvetica Neue", helvetica, arial, "Hiragino Kaku Gothic Pro", Meiryo, "MS Gothic", sans-serif;
+
+	:is(&::before, &::after) {
+		content: "";
+		position: absolute;
+	}
+
+	&::before {
+		top: 8rem;
+		left: 9rem;
+
+		filter: blur(9rem);
+
+		border-radius: var(--radius-blob-3);
+		background-color: var(--pink-8);
+
+		width: 25rem;
+		height: 13rem;
+	}
+
+	&::after {
+		right: 12rem;
+		bottom: 6rem;
+
+		filter: blur(11rem);
+
+		border-radius: var(--radius-blob-1);
+		background-color: var(--violet-8);
+
+		width: 20rem;
+		height: 17rem;
+	}
+
+	.main-header {
+		.main-header__links {
+			$separation: 0;
+			$blur: 0.125rem;
+
+			border-radius: var(--radius-2);
+			padding: 2rem 4rem;
+			background-color: var(--clr-surface-2);
+
+			font-size: 1.25rem;
+			font-weight: 500;
+
+			box-shadow: 1px 1px $blur $separation var(--violet-5), -1px -1px $blur $separation var(--pink-5);
+
+			&--current-page {
+				display: none;
+			}
+		}
+	}
+
+	.main--home {
+		display: none;
+	}
+}

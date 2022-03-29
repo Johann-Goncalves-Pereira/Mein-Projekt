@@ -12,6 +12,8 @@ import Regex
 
 type alias PageModel msg =
     { route : Route
+    , rootAttr : List (Attribute msg)
+    , headerContent : List (Html msg)
     , mainContent : List (Html msg)
     , mainAttrs : List (Attribute msg)
     }
@@ -28,6 +30,8 @@ type alias Link =
 pageConfig : PageModel msg
 pageConfig =
     { route = Route.Home_
+    , rootAttr = []
+    , headerContent = []
     , mainContent = []
     , mainAttrs = []
     }
@@ -52,6 +56,9 @@ isRoute route compare =
         ( Route.Home_, Route.Home_ ) ->
             True
 
+        ( Route.Gaslur, Route.Gaslur ) ->
+            True
+
         _ ->
             False
 
@@ -62,8 +69,8 @@ caseNamePage route =
         Route.Home_ ->
             "Home"
 
-        Route.About ->
-            "About"
+        Route.Gaslur ->
+            "Gaslur"
 
         Route.NotFound ->
             "Not Found"
@@ -97,10 +104,11 @@ layout model =
             class <| "main--" ++ classBuilder (caseNamePage model.route)
     in
     [ div
-        [ id "root"
-        , class "grid grid-rows-[min-content,auto] gap-8"
-        , classList [ ( "scroll", True ), ( "root--" ++ classBuilder (caseNamePage model.route), True ) ]
-        ]
+        ([ id "root"
+         , classList [ ( "root--" ++ classBuilder (caseNamePage model.route), True ) ]
+         ]
+            ++ model.rootAttr
+        )
         [ viewHeader model
         , main_ (mainClass :: model.mainAttrs) model.mainContent
         ]
@@ -109,13 +117,10 @@ layout model =
 
 viewHeader : PageModel msg -> Html msg
 viewHeader model =
-    header [ class "main-header" ]
-        [ viewHeaderLinks model [ Route.Home_, Route.About ]
-            |> nav
-                [ class "main-header__nav"
-                , class "flex justify-center gap-4 text-2xl bg-surface-1 shadow-inner"
-                ]
-        ]
+    header [ class "main-header" ] <|
+        nav [ class "main-header__nav" ]
+            (viewHeaderLinks model [ Route.Home_, Route.Gaslur ])
+            :: model.headerContent
 
 
 viewHeaderLinks : PageModel msg -> List Route -> List (Html msg)
@@ -135,8 +140,7 @@ viewHeaderLinks model links =
 viewLink : Link -> Html msg
 viewLink model =
     a
-        [ class "p-4 font-semibold md:p-8"
-        , class "main-header__links"
+        [ class "main-header__links"
         , classList
             [ ( "main-header__links--current-page"
               , isRoute model.routeReceived model.routeStatic
