@@ -16,6 +16,10 @@
 	font-family: "Poppins", sans-serif;
 	background-color: var(--gaslur-surface-0);
 
+	padding: 0 max(2rem, 3vw);
+
+	overflow-x: hidden;
+
 	.main-header {
 		display: grid;
 		grid-template-columns: 1fr 2fr 1fr;
@@ -32,7 +36,7 @@
 			&--current-page {
 				display: inline-block;
 
-				padding: 0.5rem 2rem;
+				padding: 0.5rem 0;
 				margin-right: auto;
 
 				font-weight: 700;
@@ -78,10 +82,11 @@
 			display: flex;
 			align-items: center;
 			gap: 2rem;
+			margin-left: auto;
 
 			&__link {
 				padding: 1rem 2rem;
-				color: var(--clr-text-2);
+				color: var(--clr-text-1);
 
 				@include text-base-config();
 
@@ -94,5 +99,103 @@
 	}
 }
 
+.main--gaslur {
+	.main {
+		display: grid;
+		grid-template-columns: 3fr 2fr;
+		justify-items: center;
+		align-items: center;
+		gap: clamp(4rem, 15vw + 1rem, 25rem);
 
+		height: calc(100vh - 6rem);
 
+		&__ctnr {
+			padding: 3rem 0;
+
+			&:last-child {
+				margin-left: auto;
+			}
+
+			.btm {
+				padding: 0.75rem 2.5rem;
+				border-radius: 0.625rem;
+				font-weight: 600;
+
+				background: linear-gradient(103.91deg, var(--gaslur-brand-0) 21.01%, hsla(var(--a-gaslur-brand-1), 0.5) 100%);
+				color: var(--clr-text-1);
+
+				&--border {
+					border: 1px solid var(--clr-text-1);
+					background-image: var(--);
+				}
+			}
+		}
+	}
+
+	.glass-card {
+		$bottom-size: 4rem;
+		$space: 1.75rem;
+
+		position: relative;
+
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: center;
+		gap: $space;
+
+		padding: $space;
+
+		height: 36.5625rem;
+		width: 31.875rem;
+
+		backdrop-filter: blur(117px);
+		z-index: 1;
+
+		:is(&::before, &::after) {
+			$size: 12rem;
+
+			content: "";
+			position: absolute;
+
+			height: $size;
+			width: $size;
+
+			filter: blur(150px);
+			z-index: -3;
+		}
+
+		&::before {
+			top: -3rem;
+			left: -6rem;
+
+			background-color: var(--gaslur-brand-0);
+		}
+
+		&::after {
+			right: -6rem;
+			bottom: -3rem;
+
+			background-color: var(--gaslur-brand-1);
+		}
+
+		&__svg {
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+		}
+
+		&__image {
+			// height: 100%;
+			width: auto;
+
+			border-radius: var(--radius-4);
+		}
+
+		&__bottom {
+			display: grid;
+			grid-template-columns: 3.5rem 1fr 1fr;
+			width: 100%;
+		}
+	}
+}
