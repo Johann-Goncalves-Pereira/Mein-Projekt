@@ -1,18 +1,26 @@
 # Let see what this become
 
 
+
+
 ## Run Locally
+
+First Install
+
+```sh
+yarn
+```
 
 Development.
 ```sh
-npm run dev
+yarn dev
 ```
 
 Production.
 ```sh
-npm run build
+yarn build
 ```
 And to check production. (need to run build first)
 ```sh
-npm run preview
+yarn preview
 ```
