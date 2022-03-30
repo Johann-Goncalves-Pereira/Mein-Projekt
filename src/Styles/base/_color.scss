@@ -56,7 +56,7 @@ $page-colors: (
 		@each $type, $shades in $types {
 			@each $shade, $colors in $shades {
 				--#{$page}-#{$type}-#{$shade}: #{$colors};
-				--a-#{$page}-#{$type}-#{$shade}: #{hsl-slice($colors)};
+				--#{$page}-a-#{$type}-#{$shade}: #{hsl-slice($colors)};
 			}
 		}
 	}
