@@ -135,11 +135,7 @@
 				border-radius: 0.625rem;
 				font-weight: 600;
 
-				background: linear-gradient(
-					103.91deg,
-					var(--gaslur-brand-0) 21.01%,
-					hsla(var(--gaslur-a-brand-1), 0.5) 100%
-				);
+				background: linear-gradient(103.91deg, var(--gaslur-brand-0) 21.01%, hsla(var(--gaslur-a-brand-1), 0.5) 100%);
 				color: var(--clr-text-1);
 
 				&--border {
@@ -221,6 +217,43 @@
 		&__header {
 			&__btm {
 				color: var(--clr-text-1);
+			}
+		}
+
+		&__list {
+			display: grid;
+			grid-template-columns: repeat(var(--number-of-col, 5), 1fr);
+			gap: 2rem;
+		}
+
+		.item {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			align-items: end;
+			gap: 0.5em;
+
+			&::before {
+				content: "";
+				grid-row-start: 3;
+				grid-column: 1 / span 2;
+
+				height: 2px;
+				// width: 100%;
+				background-color: var(--clr-text-2);
+			}
+
+			&__end-date {
+				color: var(--clr-text-2);
+
+				time {
+					color: var(--clr-text-0);
+				}
+			}
+
+			&__btm {
+				padding: 0.125em 1.25em;
+				border-radius: 10px;
+				border: 2px solid var(--clr-text-0);
 			}
 		}
 	}

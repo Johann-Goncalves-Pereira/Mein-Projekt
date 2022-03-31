@@ -1,7 +1,7 @@
 @use "../abstracts/" as *;
 @use "sass:string";
 
-//? Prevent Hsl to transform in Hex.
+//? Prevent Hsl to transform to Hex.
 @function hsl($h, $s, $l) {
 	@return unquote("hsl(#{$h}, #{$s}, #{$l})");
 }
