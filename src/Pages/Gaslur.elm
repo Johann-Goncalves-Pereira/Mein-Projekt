@@ -3,16 +3,17 @@ module Pages.Gaslur exposing (Model, Msg, page)
 import Array exposing (Array)
 import Browser.Dom exposing (Viewport, getViewport)
 import Browser.Events as BrowserEvents
-import Components.Svg as SVG
+import Components.Svg as SVG exposing (gaslur)
 import Gen.Params.Gaslur exposing (Params)
 import Gen.Route as Route
-import Html exposing (Html, a, button, div, em, h1, h2, header, img, li, nav, p, section, span, strong, text, ul)
+import Html exposing (Html, a, button, div, em, footer, h1, h2, h3, h4, h5, header, img, li, nav, p, section, small, span, strong, text, ul)
 import Html.Attributes as HA exposing (alt, attribute, class, classList, href, id, src)
 import Html.Attributes.Aria exposing (ariaLabelledby)
 import Page
 import Platform exposing (Task)
 import Request
 import Shared
+import Svg.Attributes exposing (display)
 import Task
 import UI exposing (pageConfig)
 import View exposing (View)
@@ -86,6 +87,7 @@ view model =
                 | route = Route.Gaslur
                 , headerContent = viewHeader
                 , mainContent = viewMain model
+                , pageFooter = Just viewFooter
             }
     }
 
@@ -119,6 +121,8 @@ viewMain : Model -> List (Html Msg)
 viewMain model =
     [ viewMainSection
     , viewHotActions model
+    , viewGettingStarted
+    , viewDiscover model
     ]
 
 
@@ -142,48 +146,52 @@ viewMainSection =
                     , strong [] [ text "Laura" ]
                     , span [] [ text <| String.fromFloat 0.21 ++ " Weth" ]
                     , strong [ class "col-start-3 row-start-1 ml-auto" ] [ textToUpper "WE ARE HERE" ]
-                    , span [ class "flex gap-2 ml-auto" ] [ SVG.gaslur SVG.Heart, text <| String.fromInt 25 ]
+                    , span [ class "flex gap-2 ml-auto" ] [ gaslur SVG.Heart, text <| String.fromInt 25 ]
                     ]
-                , SVG.gaslur SVG.GlassCard
+                , gaslur SVG.GlassCard
                 ]
             ]
         ]
 
 
-viewHotActions : Model -> Html Msg
-viewHotActions model =
+screenViewportWidth : Model -> Int
+screenViewportWidth model =
+    Tuple.first model.windowViewport
+
+
+numberOfItems : Model -> Int
+numberOfItems model =
     let
         w =
-            Tuple.first model.windowViewport
-
-        numberOfItems : Int
-        numberOfItems =
-            if w <= 640 then
-                2
-
-            else if w <= 768 then
-                3
-
-            else if w <= 1024 then
-                4
-
-            else if w <= 1536 then
-                5
-                -- else if w <= 1536 then
-                --     8
-
-            else
-                6
+            screenViewportWidth model
     in
-    section [ class "hot-actions", ariaLabelledby "hot-actions-heading" ]
+    if w <= 640 then
+        2
+
+    else if w <= 768 then
+        3
+
+    else if w <= 1024 then
+        4
+
+    else if w <= 1536 then
+        5
+
+    else
+        6
+
+
+viewHotActions : Model -> Html Msg
+viewHotActions model =
+    section [ class "list-wrapper", ariaLabelledby "hot-actions-heading" ]
         [ header [ class "flex justify-between mb-7" ]
             [ h2 [ class "text-[2.625rem] font-medium", id "hot-actions-heading" ] [ text "Hot auctions" ]
-            , button [ class "hot-actions__header__btm flex items-center gap-3" ] [ strong [] [ text "View all" ], SVG.gaslur SVG.Arrow ]
+            , button [ class "list-wrapper__header__btm flex items-center gap-3" ] [ strong [] [ text "View all" ], gaslur SVG.Arrow ]
             ]
-        , hotActionsListContent numberOfItems
+        , hotActionsListContent (numberOfItems model)
             |> ul
-                [ class "hot-actions__list"
-                , attribute "style" <| "--number-of-col:" ++ String.fromInt numberOfItems
+                [ class "list-wrapper__list"
+                , attribute "style" <| "--number-of-col:" ++ String.fromInt (numberOfItems model)
                 ]
         ]
 
@@ -225,3 +233,109 @@ hotActionsListContent nItens =
                 ]
         )
         (sliceItems nItens listContent)
+
+
+viewGettingStarted : Html Msg
+viewGettingStarted =
+    section [ class "getting-started grid gap-12 my-52", ariaLabelledby "getting-started-heading" ]
+        [ header []
+            [ h3 [ class "mb-5 text-center text-4xl font-medium", id "getting-started-heading" ] [ text "Getting started" ]
+            , p [ class "text-center text-xl font-medium" ] [ text "Eu, molestie commodo, enim pellentesque turpis integer sagittis" ]
+            ]
+        , List.map
+            (\( icon, txt ) ->
+                li [ class "item" ]
+                    [ div [ class "item__icon" ] [ icon ]
+                    , p [ class "item__text" ] [ text txt ]
+                    ]
+            )
+            [ ( gaslur SVG.Shield, "Connect your wallet" )
+            , ( gaslur SVG.Archive, "Posuere urna, sit amet molestie leo" )
+            , ( gaslur SVG.Gallery, "Semper pretium libero sed quam ac integer ut" )
+            , ( gaslur SVG.Rocket, "Lectus volutpat magna vitae in arcu" )
+            ]
+            |> ul [ class "flex justify-around items-start" ]
+        ]
+
+
+viewDiscover : Model -> Html Msg
+viewDiscover model =
+    section [ class "list-wrapper grid gap-9", ariaLabelledby "hot-actions-heading" ]
+        [ header [ class "flex justify-between" ]
+            [ h2 [ class "text-[2.625rem] font-medium", id "hot-actions-heading" ] [ text "Discover" ]
+            , div [ class "flex items-center gap-3" ]
+                [ button [ class "list-wrapper__header__btms" ] [ gaslur SVG.ListToTop, text "Category" ]
+                , button [ class "list-wrapper__header__btms" ] [ text "Cheapest", gaslur SVG.SimpleArrow ]
+                , button [ class "list-wrapper__header__btms" ] [ text "Newest", gaslur SVG.SimpleArrow ]
+                , button [ class "list-wrapper__header__btms" ] [ gaslur SVG.Filter, text "Filter" ]
+                ]
+            ]
+        , hotActionsListContent (numberOfItems model)
+            |> ul
+                [ class "list-wrapper__list"
+                , attribute "style" <| "--number-of-col:" ++ String.fromInt (numberOfItems model)
+                ]
+        , hotActionsListContent (numberOfItems model)
+            |> ul
+                [ class "list-wrapper__list"
+                , attribute "style" <| "--number-of-col:" ++ String.fromInt (numberOfItems model)
+                ]
+        , button [ class "list-wrapper__btm" ] [ textToUpper "Load more" ]
+        ]
+
+
+viewFooter : Html Msg
+viewFooter =
+    let
+        headingCompose : String -> String
+        headingCompose title =
+            "foot-heading--" ++ title
+
+        ulCompose l =
+            ul [ class "sect__list" ] l
+
+        liCompose i =
+            li [ class "" ] i
+
+        listItens =
+            [ ( "Marketplace", ulCompose marketplace )
+            , ( "Company", ulCompose company )
+            , ( "Portfolio", ulCompose contact )
+            ]
+
+        marketplace =
+            [ liCompose [ text "Home" ]
+            , liCompose [ text "Activity" ]
+            , liCompose [ text "Discover" ]
+            , liCompose [ text "Learn more" ]
+            ]
+
+        company =
+            [ liCompose [ text "About Us" ]
+            , liCompose [ text "Services" ]
+            , liCompose [ text "Portfolio" ]
+            ]
+
+        contact =
+            [ liCompose [ text "Facebook" ]
+            , liCompose [ text "Instagram" ]
+            , liCompose [ text "Twitter" ]
+            , liCompose [ text "Email" ]
+            ]
+    in
+    footer [ class "footer--gaslur" ] <|
+        [ h4 [ class "footer--gaslur__title" ] [ text "Etiam et id tincidunt faucibus mollis a sociis pretium fermentum quis magna faucibus lacus." ]
+            :: List.map
+                (\( title, content ) ->
+                    section [ class "sect", ariaLabelledby <| headingCompose title ]
+                        [ header [] [ h5 [ class "sect__title", id <| headingCompose title ] [ text title ] ]
+                        , content
+                        ]
+                )
+                listItens
+            |> div [ class "footer--gaslur__header" ]
+        , div [ class "flex justify-between" ]
+            [ div [ class "flex items-center gap-4" ] [ gaslur SVG.Instagram, gaslur SVG.Facebook, gaslur SVG.Twitter ]
+            , small [ class "font-light text-xl text-[#828282]" ] [ text "Copyright 2021 Gaslur" ]
+            ]
+        ]

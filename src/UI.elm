@@ -16,6 +16,7 @@ type alias PageModel msg =
     , headerContent : List (Html msg)
     , mainContent : List (Html msg)
     , mainAttrs : List (Attribute msg)
+    , pageFooter : Maybe (Html msg)
     }
 
 
@@ -34,6 +35,7 @@ pageConfig =
     , headerContent = []
     , mainContent = []
     , mainAttrs = []
+    , pageFooter = Nothing
     }
 
 
@@ -111,6 +113,7 @@ layout model =
         )
         [ viewHeader model
         , main_ (mainClass :: model.mainAttrs) model.mainContent
+        , Maybe.withDefault (text "") model.pageFooter
         ]
     ]
 
