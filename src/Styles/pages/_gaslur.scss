@@ -1,3 +1,6 @@
+@use "../abstracts/" as *;
+@use "sass:math" as *;
+
 @mixin text-gradient-color {
 	//& text background color trick.
 	background: linear-gradient(93.51deg, var(--gaslur-brand-0) 2.84%, var(--gaslur-brand-1) 99.18%);
@@ -40,7 +43,7 @@
 
 .gaslur__header {
 	display: grid;
-	grid-template-columns: 1fr 2fr 1fr;
+	grid-template-columns: 1fr 1fr;
 	align-items: center;
 	justify-items: center;
 
@@ -59,31 +62,39 @@
 	}
 
 	.nav {
-		display: flex;
+		display: none;
+	}
 
-		&__link {
-			$px: 1.5rem;
-			padding: 1.25rem $px;
-			font-weight: 500;
+	@include md(xl) {
+		grid-template-columns: 1fr 2fr 1fr;
 
-			@include text-base-config();
+		.nav {
+			display: flex;
 
-			&--current {
-				position: relative;
-				font-weight: 700;
-				@include text-gradient-color();
+			&__link {
+				$px: 1.5rem;
+				padding: 1.25rem $px;
+				font-weight: 500;
 
-				&::after {
-					content: "";
-					position: absolute;
-					inset-inline: $px + 0.125;
-					bottom: 0.75rem;
+				@include text-base-config();
 
-					height: 0.125rem;
-					border-radius: var(--radius-round);
+				&--current {
+					position: relative;
+					font-weight: 700;
+					@include text-gradient-color();
 
-					background-color: var(--gaslur-brand-0);
-					background-image: linear-gradient(90deg, var(--gaslur-brand-0) 53%, var(--gaslur-brand-1) 127%);
+					&::after {
+						content: "";
+						position: absolute;
+						inset-inline: $px + 0.125;
+						bottom: 0.75rem;
+
+						height: 0.125rem;
+						border-radius: var(--radius-round);
+
+						background-color: var(--gaslur-brand-0);
+						background-image: linear-gradient(90deg, var(--gaslur-brand-0) 53%, var(--gaslur-brand-1) 127%);
+					}
 				}
 			}
 		}
@@ -93,6 +104,7 @@
 		display: flex;
 		align-items: center;
 		gap: 2rem;
+		margin-left: auto;
 		margin-left: auto;
 
 		&__link {
@@ -111,20 +123,31 @@
 
 .main--gaslur {
 	.main {
-		display: grid;
-		grid-template-columns: 3fr 2fr;
+		display: flex;
+		flex-direction: column;
 		justify-items: center;
 		align-items: center;
-		gap: clamp(4rem, 15vw + 1rem, 25rem);
 
-		height: calc(100vh - 6rem);
+		gap: 2rem 2rem;
+		margin-block: 6rem;
 
-		&__ctnr {
-			padding: 3rem 0;
+		@include md(lg) {
+			display: grid;
+			grid-template-columns: 3fr 2fr;
+			height: calc(100vh - 6rem);
+			margin-block: 0;
 
-			&:last-child {
+			&__ctnr:last-child {
 				margin-left: auto;
 			}
+		}
+
+		@include md(xl) {
+			gap: clamp(2rem, 10vw + 1rem, 25rem);
+		}
+
+		&__ctnr {
+			// padding: 3rem 0;
 
 			.btm {
 				padding: 0.75rem 2.5rem;
@@ -137,7 +160,7 @@
 
 				&--border {
 					border: 1px solid var(--clr-text-1);
-					background-image: var(--);
+					background-image: none;
 				}
 			}
 		}
@@ -160,6 +183,20 @@
 		height: 36.5625rem;
 		width: 31.875rem;
 
+		@mixin size($h) {
+			$w: div($h * 31.875, 36.5625);
+
+			height: $h + rem;
+			width: $w + rem;
+		}
+
+		@include md(xl) {
+			@include size(42);
+		}
+
+		@include md(2xl) {
+			@include size(50);
+		}
 		backdrop-filter: blur(117px);
 		z-index: 1;
 
@@ -194,6 +231,8 @@
 			position: absolute;
 			inset: 0;
 			z-index: -1;
+			width: 100%;
+			height: 100%;
 		}
 
 		&__image {
@@ -356,8 +395,13 @@
 
 	&__header {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
+		flex-wrap: wrap;
 		gap: 2rem;
+
+		@include md(xl) {
+			justify-content: space-between;
+		}
 	}
 
 	.sect {
