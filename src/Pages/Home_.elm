@@ -2,7 +2,7 @@ module Pages.Home_ exposing (Model, Msg, page)
 
 import Gen.Params.Home_ exposing (Params)
 import Gen.Route as Route
-import Html exposing (Html, a, div, h1, h2, h5, p, section, text)
+import Html exposing (Html, a, button, div, h1, h2, h5, p, section, text)
 import Html.Attributes exposing (alt, attribute, class, href, id, rel, src, style, tabindex, target)
 import Html.Attributes.Aria exposing (ariaLabel, ariaLabelledby)
 import Page
@@ -61,6 +61,18 @@ view model =
         UI.layout
             { pageConfig
                 | route = Route.Home_
-                , mainContent = []
+                , mainContent = viewMain model
             }
     }
+
+
+viewMain : Model -> List (Html Msg)
+viewMain model =
+    [ viewTemplates model ]
+
+
+viewTemplates : Model -> Html Msg
+viewTemplates model =
+    section []
+        [ a [ href <| Route.toHref Route.Template__Gaslur ] [ text "link" ]
+        ]

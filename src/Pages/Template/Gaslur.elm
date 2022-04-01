@@ -1,4 +1,4 @@
-module Pages.Gaslur exposing (Model, Msg, page)
+module Pages.Template.Gaslur exposing (Model, Msg, page)
 
 import Array exposing (Array)
 import Browser.Dom exposing (Viewport, getViewport)
@@ -6,7 +6,7 @@ import Browser.Events as BrowserEvents
 import Components.Svg as SVG exposing (gaslur)
 import Gen.Params.Gaslur exposing (Params)
 import Gen.Route as Route
-import Html exposing (Html, a, button, div, em, footer, h1, h2, h3, h4, h5, header, img, li, nav, p, section, small, span, strong, text, ul)
+import Html exposing (Html, a, button, div, em, footer, h1, h2, h3, h4, h5, header, img, li, main_, nav, p, section, small, span, strong, text, ul)
 import Html.Attributes as HA exposing (alt, attribute, class, classList, href, id, src)
 import Html.Attributes.Aria exposing (ariaLabelledby)
 import Page
@@ -25,7 +25,7 @@ page shared req =
         { init = init
         , update = update
         , view = view
-        , subscriptions = subs
+        , subscriptions = subscription
         }
 
 
@@ -75,21 +75,33 @@ update msg model =
 
 
 
+-- SUBSCRIPTION
+
+
+subscription : Model -> Sub Msg
+subscription _ =
+    BrowserEvents.onResize (\w h -> NewViewport ( w, h ))
+
+
+
 -- VIEW
 
 
 view : Model -> View Msg
 view model =
-    { title = "Gaslur - Home"
+    { title = "Template - Gaslur"
     , body =
         UI.layout
             { pageConfig
-                | route = Route.Gaslur
-                , headerContent = viewHeader
-                , mainContent = viewMain model
-                , pageFooter = Just viewFooter
+                | route = Route.Template__Gaslur
+                , pageSandbox = Just <| viewPage model
             }
     }
+
+
+viewPage : Model -> List (Html Msg)
+viewPage model =
+    [ viewHeader, viewMain model, viewFooter ]
 
 
 textToUpper : String -> Html msg
@@ -97,33 +109,31 @@ textToUpper str =
     text <| String.toUpper str
 
 
-viewHeader : List (Html Msg)
+viewHeader : Html Msg
 viewHeader =
-    [ nav [ class "nav" ]
-        [ a [ class "nav__link nav__link--current", href "#" ] [ textToUpper "Home" ]
-        , a [ class "nav__link", href "#" ] [ textToUpper "My profile" ]
-        , a [ class "nav__link", href "#" ] [ textToUpper "activity" ]
-        , a [ class "nav__link", href "#" ] [ textToUpper "how it works" ]
+    header [ class "gaslur__header" ]
+        [ a [ class "gaslur__header__link", HA.href <| Route.toHref Route.Home_ ] [ text "Gaslur" ]
+        , nav [ class "nav" ]
+            [ a [ class "nav__link nav__link--current", href "#" ] [ textToUpper "Home" ]
+            , a [ class "nav__link", href "#" ] [ textToUpper "My profile" ]
+            , a [ class "nav__link", href "#" ] [ textToUpper "activity" ]
+            , a [ class "nav__link", href "#" ] [ textToUpper "how it works" ]
+            ]
+        , nav [ class "login" ]
+            [ button [ class "login__link login__link--border" ] [ textToUpper "create" ]
+            , button [ class "login__link" ] [ textToUpper "sign in" ]
+            ]
         ]
-    , nav [ class "login" ]
-        [ button [ class "login__link login__link--border" ] [ textToUpper "create" ]
-        , button [ class "login__link" ] [ textToUpper "sign in" ]
-        ]
-    ]
 
 
-subs : Model -> Sub Msg
-subs _ =
-    BrowserEvents.onResize (\w h -> NewViewport ( w, h ))
-
-
-viewMain : Model -> List (Html Msg)
+viewMain : Model -> Html Msg
 viewMain model =
-    [ viewMainSection
-    , viewHotActions model
-    , viewGettingStarted
-    , viewDiscover model
-    ]
+    main_ [ class "main--gaslur" ]
+        [ viewMainSection
+        , viewHotActions model
+        , viewGettingStarted
+        , viewDiscover model
+        ]
 
 
 viewMainSection : Html Msg

@@ -36,81 +36,74 @@
 			background-image: linear-gradient(103.91deg, var(--gaslur-brand-0) 21.01%, var(--gaslur-brand-1) 100%);
 		}
 	}
+}
 
-	.main-header {
-		display: grid;
-		grid-template-columns: 1fr 2fr 1fr;
-		align-items: center;
-		justify-items: center;
+.gaslur__header {
+	display: grid;
+	grid-template-columns: 1fr 2fr 1fr;
+	align-items: center;
+	justify-items: center;
 
-		&__nav {
-			margin-right: auto;
-		}
+	&__link {
+		margin-right: auto;
+		display: inline-block;
 
-		&__links {
-			display: none;
+		padding: 0.5rem 0;
+		margin-right: auto;
 
-			&--current-page {
-				display: inline-block;
+		font-weight: 700;
+		font-size: 3rem;
 
-				padding: 0.5rem 0;
-				margin-right: auto;
+		@include text-base-config();
+		@include text-gradient-color();
+	}
 
+	.nav {
+		display: flex;
+
+		&__link {
+			$px: 1.5rem;
+			padding: 1.25rem $px;
+			font-weight: 500;
+
+			@include text-base-config();
+
+			&--current {
+				position: relative;
 				font-weight: 700;
-				font-size: 3rem;
-
-				@include text-base-config();
 				@include text-gradient-color();
-			}
-		}
 
-		.nav {
-			display: flex;
+				&::after {
+					content: "";
+					position: absolute;
+					inset-inline: $px + 0.125;
+					bottom: 0.75rem;
 
-			&__link {
-				$px: 1.5rem;
-				padding: 1.25rem $px;
-				font-weight: 500;
+					height: 0.125rem;
+					border-radius: var(--radius-round);
 
-				@include text-base-config();
-
-				&--current {
-					position: relative;
-					font-weight: 700;
-					@include text-gradient-color();
-
-					&::after {
-						content: "";
-						position: absolute;
-						inset-inline: $px + 0.125;
-						bottom: 0.75rem;
-
-						height: 0.125rem;
-						border-radius: var(--radius-round);
-
-						background-color: var(--gaslur-brand-0);
-						background-image: linear-gradient(90deg, var(--gaslur-brand-0) 53%, var(--gaslur-brand-1) 127%);
-					}
+					background-color: var(--gaslur-brand-0);
+					background-image: linear-gradient(90deg, var(--gaslur-brand-0) 53%, var(--gaslur-brand-1) 127%);
 				}
 			}
 		}
+	}
 
-		.login {
-			display: flex;
-			align-items: center;
-			gap: 2rem;
-			margin-left: auto;
+	.login {
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+		margin-left: auto;
 
-			&__link {
-				padding: 1rem 2rem;
-				color: var(--clr-text-1);
+		&__link {
+			padding: 1rem 2rem;
+			color: var(--clr-text-1);
 
-				@include text-base-config();
+			@include text-base-config();
 
-				&--border {
-					border-radius: 0.625rem;
-					border: 2px solid var(--clr-text-1);
-				}
+			&--border {
+				border-radius: 0.625rem;
+				border: 2px solid var(--clr-text-1);
 			}
 		}
 	}
