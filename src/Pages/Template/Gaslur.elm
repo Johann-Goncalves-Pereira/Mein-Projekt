@@ -176,12 +176,15 @@ numberOfItems model =
             screenViewportWidth model
     in
     if w <= 640 then
-        2
+        1
 
     else if w <= 768 then
-        3
+        2
 
     else if w <= 1024 then
+        3
+
+    else if w <= 1280 then
         4
 
     else if w <= 1536 then
@@ -264,7 +267,7 @@ viewGettingStarted =
             , ( gaslur SVG.Gallery, "Semper pretium libero sed quam ac integer ut" )
             , ( gaslur SVG.Rocket, "Lectus volutpat magna vitae in arcu" )
             ]
-            |> ul [ class "flex justify-around items-start" ]
+            |> ul [ class "flex justify-around items-start flex-wrap gap-6" ]
         ]
 
 
@@ -273,7 +276,7 @@ viewDiscover model =
     section [ class "list-wrapper grid gap-9", ariaLabelledby "hot-actions-heading" ]
         [ header [ class "flex justify-between" ]
             [ h2 [ class "text-[2.625rem] font-medium", id "hot-actions-heading" ] [ text "Discover" ]
-            , div [ class "flex items-center gap-3" ]
+            , div [ class "hidden lg:flex items-center gap-3" ]
                 [ button [ class "list-wrapper__header__btms" ] [ gaslur SVG.ListToTop, text "Category" ]
                 , button [ class "list-wrapper__header__btms" ] [ text "Cheapest", gaslur SVG.SimpleArrow ]
                 , button [ class "list-wrapper__header__btms" ] [ text "Newest", gaslur SVG.SimpleArrow ]
