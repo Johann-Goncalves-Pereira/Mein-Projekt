@@ -1,13 +1,15 @@
 .root--home {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	// display: flex;
+	// align-items: center;
+	// justify-content: center;
 	font-family: "Fredoka", spotify-circular, spotify-circular-cyrillic, spotify-circular-arabic, spotify-circular-hebrew,
 		"Helvetica Neue", helvetica, arial, "Hiragino Kaku Gothic Pro", Meiryo, "MS Gothic", sans-serif;
+	z-index: 1;
 
 	:is(&::before, &::after) {
 		content: "";
 		position: absolute;
+		z-index: -1;
 	}
 
 	&::before {
@@ -25,7 +27,7 @@
 
 	&::after {
 		right: 12rem;
-		bottom: 6rem;
+		top: calc(100vh - 26rem);
 
 		filter: blur(11rem);
 
@@ -41,6 +43,8 @@
 			$separation: 0;
 			$blur: 0.125rem;
 
+			display: inline-block;
+
 			border-radius: var(--radius-2);
 			padding: 2rem 4rem;
 			background-color: var(--clr-surface-2);
@@ -51,12 +55,11 @@
 			box-shadow: 1px 1px $blur $separation var(--violet-5), -1px -1px $blur $separation var(--pink-5);
 
 			&--current-page {
-				display: none;
+				// display: none;
 			}
 		}
 	}
-
-	.main--home {
-		display: none;
-	}
+}
+.main--home {
+	// display: none;
 }

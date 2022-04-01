@@ -16,6 +16,8 @@ type alias PageModel msg =
     , headerContent : List (Html msg)
     , mainContent : List (Html msg)
     , mainAttrs : List (Attribute msg)
+    , pageFooter : Maybe (Html msg)
+    , pageSandbox : Maybe (List (Html msg))
     }
 
 
@@ -34,6 +36,8 @@ pageConfig =
     , headerContent = []
     , mainContent = []
     , mainAttrs = []
+    , pageFooter = Nothing
+    , pageSandbox = Nothing
     }
 
 
@@ -56,7 +60,7 @@ isRoute route compare =
         ( Route.Home_, Route.Home_ ) ->
             True
 
-        ( Route.Gaslur, Route.Gaslur ) ->
+        ( Route.Template__Gaslur, Route.Template__Gaslur ) ->
             True
 
         _ ->
@@ -69,7 +73,7 @@ caseNamePage route =
         Route.Home_ ->
             "Home"
 
-        Route.Gaslur ->
+        Route.Template__Gaslur ->
             "Gaslur"
 
         Route.NotFound ->
@@ -102,6 +106,17 @@ layout model =
         mainClass : Attribute msg
         mainClass =
             class <| "main--" ++ classBuilder (caseNamePage model.route)
+
+        caseSandbox =
+            case model.pageSandbox of
+                Just content ->
+                    content
+
+                Nothing ->
+                    [ viewHeader model
+                    , main_ (mainClass :: model.mainAttrs) model.mainContent
+                    , Maybe.withDefault (text "") model.pageFooter
+                    ]
     in
     [ div
         ([ id "root"
@@ -109,9 +124,7 @@ layout model =
          ]
             ++ model.rootAttr
         )
-        [ viewHeader model
-        , main_ (mainClass :: model.mainAttrs) model.mainContent
-        ]
+        caseSandbox
     ]
 
 
@@ -119,7 +132,7 @@ viewHeader : PageModel msg -> Html msg
 viewHeader model =
     header [ class "main-header" ] <|
         nav [ class "main-header__nav" ]
-            (viewHeaderLinks model [ Route.Home_, Route.Gaslur ])
+            (viewHeaderLinks model [ Route.Home_ ])
             :: model.headerContent
 
 
