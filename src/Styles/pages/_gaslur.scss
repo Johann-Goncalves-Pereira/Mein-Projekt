@@ -46,6 +46,7 @@
 	grid-template-columns: 1fr 1fr;
 	align-items: center;
 	justify-items: center;
+	margin-top: 0.5rem;
 
 	&__link {
 		margin-right: auto;
@@ -134,7 +135,7 @@
 		@include md(lg) {
 			display: grid;
 			grid-template-columns: 3fr 2fr;
-			height: calc(100vh - 6rem);
+			height: calc(100vh - 4rem);
 			margin-block: 0;
 
 			&__ctnr:last-child {
