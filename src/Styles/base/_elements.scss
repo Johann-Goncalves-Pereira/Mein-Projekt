@@ -1,9 +1,10 @@
-//! Main div with all the things
+body {
+	color: var(--clr-text-0);
+	background: var(--clr-surface-1);
+}
+
 #root {
 	//? Now #root is the new base
 	position: absolute;
 	inset: 0;
-
-	color: var(--clr-text-0);
-	background: var(--clr-surface-1);
 }
