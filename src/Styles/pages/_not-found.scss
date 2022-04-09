@@ -1,0 +1,32 @@
+.not-found {
+	display: grid;
+	place-content: center;
+
+	&__title {
+		font-size: 15rem;
+	}
+
+	&__text,
+	&__link {
+		text-align: center;
+		font-weight: 600;
+		font-size: 1.5rem;
+	}
+
+	&__link {
+		margin: 2rem;
+		padding: 2rem 4rem;
+
+		// border: 2px solid var(--teal-4);
+
+		background-image: linear-gradient(to right, var(--clr-surface-0) 0%, #3a6073 51%, var(--clr-surface-0) 100%);
+
+		transition: background-position 500ms ease;
+		background-size: 200% auto;
+
+		text-decoration: none;
+		&:hover {
+			background-position: right center; /* change the direction of the change here */
+		}
+	}
+}
