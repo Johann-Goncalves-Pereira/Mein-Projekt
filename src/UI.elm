@@ -73,6 +73,9 @@ caseNamePage route =
         Route.Home_ ->
             "Home"
 
+        Route.Template__Kafer ->
+            "Kafer"
+
         Route.Template__Gaslur ->
             "Gaslur"
 
