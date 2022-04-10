@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Browser.Dom exposing (Viewport, getViewport)
 import Browser.Events as BrowserEvents
 import Components.Svg as SVG exposing (gaslur)
-import Gen.Params.Gaslur exposing (Params)
+import Gen.Params.Home_ exposing (Params)
 import Gen.Route as Route
 import Html exposing (Html, a, button, div, em, footer, h1, h2, h3, h4, h5, header, img, li, main_, nav, p, section, small, span, strong, text, ul)
 import Html.Attributes as HA exposing (alt, attribute, class, classList, href, id, src)

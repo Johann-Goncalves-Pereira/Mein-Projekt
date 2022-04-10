@@ -1,0 +1,15 @@
+.root--kafer {
+	background-color: var(--kafer-surface-0);
+	color: var(--clr-surface-0);
+
+	header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		nav {
+		
+			flex: 1;
+		}
+	}
+}
