@@ -5,6 +5,8 @@
 	font-family: "Fredoka", spotify-circular, spotify-circular-cyrillic, spotify-circular-arabic, spotify-circular-hebrew,
 		"Helvetica Neue", helvetica, arial, "Hiragino Kaku Gothic Pro", Meiryo, "MS Gothic", sans-serif;
 	z-index: 1;
+	display: flex;
+	flex-direction: column;
 
 	:is(&::before, &::after) {
 		content: "";
@@ -61,5 +63,21 @@
 	}
 }
 .main--home {
-	// display: none;
+	display: grid;
+	flex: 1;
+
+	.templates {
+		position: relative;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 2rem;
+
+		margin: auto;
+
+		&__container {
+			padding: 5rem;
+			outline: 1px solid var(--red-6);
+			border-radius: var(--radius-2);
+		}
+	}
 }
