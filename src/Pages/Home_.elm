@@ -73,7 +73,11 @@ viewMain model =
 
 viewTemplates : Model -> Html Msg
 viewTemplates model =
-    section []
-        [ a [ href <| Route.toHref Route.Template__Gaslur ] [ text "Gaslur" ]
-        , a [ href <| Route.toHref Route.Template__Kafer ] [ text "Käfer" ]
+    section [ class "templates" ]
+        [ a [ class "templates__container col-span-2", href <| Route.toHref Route.Template__Gaslur ] [ text "Gaslur" ]
+        , a [ class "templates__container row-span-2 ", href <| Route.toHref Route.Template__Kafer ] [ text "Käfer" ]
+        , a [ class "templates__container row-span-2", href <| Route.toHref Route.Template__Kafer ] [ text "3" ]
+        , a [ class "templates__container ", href <| Route.toHref Route.Template__Kafer ] [ text "4" ]
+        , a [ class "templates__container col-span-2", href <| Route.toHref Route.Template__Kafer ] [ text "5" ]
+        , a [ class "templates__container col-span-3", href <| Route.toHref Route.Template__Kafer ] [ text "6" ]
         ]
