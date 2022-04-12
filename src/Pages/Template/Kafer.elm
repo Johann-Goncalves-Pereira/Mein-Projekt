@@ -2,7 +2,8 @@ module Pages.Template.Kafer exposing (Model, Msg, page)
 
 import Gen.Params.Template.Kafer exposing (Params)
 import Gen.Route as Route
-import Html exposing (Html, a, button, div, header, li, nav, text, ul)
+import Html exposing (Html, a, button, div, h1, header, li, main_, nav, text, ul)
+import Html.Attributes exposing (class)
 import Page
 import Request
 import Shared
@@ -65,24 +66,28 @@ view model =
 
 viewPage : Model -> List (Html Msg)
 viewPage model =
-    [ header []
-        [ div [] []
-        , nav []
-            [ ul []
-                [ li []
-                    [ a [] [ text "amo besouros" ] ]
-                ]
-            , li []
-                [ a [] [ text "besouros são demais" ]
-                ]
-            , li
-                []
-                [ a [] [ text "mentira tenho medo|" ]
+    [ viewHeader model, viewMain model ]
+
+
+viewHeader : Model -> Html Msg
+viewHeader model =
+    header [ class "main-header-jd2398" ]
+        [ h1 [ class "title" ] [ text "Käfer" ]
+        , nav [ class "nav" ]
+            [ ul [ class "nav__list" ]
+                [ li [ class "nav__list__item" ] [ a [] [ text "About" ] ]
+                , li [ class "nav__list__item" ] [ a [] [ text "Menu" ] ]
+                , li [ class "nav__list__item" ] [ a [] [ text "Places" ] ]
                 ]
             ]
-        , div []
-            [ button [] [ text "sing in" ]
-            , button [] [ text "sing out" ]
+        , div [ class "sign" ]
+            [ button [ class "sign__btm sign__btm--full" ] [ text "sing in" ]
+            , button [ class "sign__btm" ] [ text "sing out" ]
             ]
         ]
-    ]
+
+
+viewMain : Model -> Html Msg
+viewMain mode =
+    main_ [ class "main-20jfm30s" ]
+        []

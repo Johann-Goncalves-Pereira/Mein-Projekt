@@ -1,15 +1,66 @@
+@import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap");
+
 .root--kafer {
+	display: flex;
+	flex-direction: column;
+
 	background-color: var(--kafer-surface-0);
 	color: var(--clr-surface-0);
 
-	header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
+	font-family: "Libre Baskerville", serif;
+}
 
-		nav {
-		
-			flex: 1;
+.main-header-jd2398 {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 2rem;
+	padding: 1rem Max(2rem, 4vw);
+
+	.title {
+		font-size: 2rem;
+		font-weight: 700;
+	}
+
+	.nav {
+		flex-grow: 1;
+
+		&__list {
+			display: flex;
+			align-items: center;
+
+			&__item {
+				a {
+					padding: 1rem 2rem;
+					font-size: 1.125rem;
+					text-transform: capitalize;
+				}
+			}
 		}
 	}
+
+	.sign {
+		display: flex;
+		gap: 1rem;
+
+		&__btm {
+			border: 2px solid var(--kafer-brand-1);
+			border-radius: var(--radius-2);
+			padding: 1rem 2rem;
+			text-transform: capitalize;
+			color: var(--kafer-brand-1);
+
+			&--full {
+				background-color: var(--kafer-brand-1);
+				color: var(--kafer-surface-0);
+			}
+		}
+	}
+}
+
+.main-20jfm30s {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	flex-grow: 1;
+	padding-inline: 2rem;
 }
