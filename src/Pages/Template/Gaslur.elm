@@ -6,9 +6,38 @@ import Browser.Events as BrowserEvents
 import Components.Svg as SVG exposing (gaslur)
 import Gen.Params.Home_ exposing (Params)
 import Gen.Route as Route
-import Html exposing (Html, a, button, div, em, footer, h1, h2, h3, h4, h5, header, img, li, main_, nav, p, section, small, span, strong, text, ul)
+import Html
+    exposing
+        ( Attribute
+        , Html
+        , a
+        , button
+        , div
+        , em
+        , footer
+        , h1
+        , h2
+        , h3
+        , h4
+        , h5
+        , header
+        , img
+        , li
+        , main_
+        , nav
+        , p
+        , section
+        , small
+        , span
+        , strong
+        , text
+        , ul
+        )
 import Html.Attributes as HA exposing (alt, attribute, class, classList, href, id, src)
 import Html.Attributes.Aria exposing (ariaLabelledby)
+import Html.Events as HtmlEvents
+import Html.Events.Extra.Mouse as MouseEvents
+import Json.Decode as Decode exposing (Decoder)
 import Page
 import Platform exposing (Task)
 import Request
@@ -34,12 +63,18 @@ page shared req =
 
 
 type alias Model =
-    { windowViewport : ( Int, Int ) }
+    { windowViewport : ( Int, Int )
+    , mousePosition : { x : Int, y : Int }
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { windowViewport = ( 0, 0 ) }, Task.perform GetViewport getViewport )
+    ( { windowViewport = ( 0, 0 )
+      , mousePosition = { x = 0, y = 0 }
+      }
+    , Task.perform GetViewport getViewport
+    )
 
 
 
@@ -49,6 +84,7 @@ init =
 type Msg
     = GetViewport Viewport
     | NewViewport ( Int, Int )
+    | MouseMove ( Float, Float )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -73,6 +109,9 @@ update msg model =
         NewViewport screenUpdate ->
             ( { model | windowViewport = screenUpdate }, Cmd.none )
 
+        MouseMove ( x, y ) ->
+            ( { model | mousePosition = { x = round x, y = round y } }, Cmd.none )
+
 
 
 -- SUBSCRIPTION
@@ -81,6 +120,43 @@ update msg model =
 subscription : Model -> Sub Msg
 subscription _ =
     BrowserEvents.onResize (\w h -> NewViewport ( w, h ))
+
+
+type alias EventWithMovement =
+    { mouseEvent : MouseEvents.Event
+    , movement : ( Float, Float )
+    }
+
+
+decodeWithMovement : Decoder EventWithMovement
+decodeWithMovement =
+    Decode.map2 EventWithMovement
+        MouseEvents.eventDecoder
+        movementDecoder
+
+
+movementDecoder : Decoder ( Float, Float )
+movementDecoder =
+    Decode.map2 (\a b -> ( a, b ))
+        (Decode.field "movementX" Decode.float)
+        (Decode.field "movementY" Decode.float)
+
+
+onMove : (EventWithMovement -> msg) -> Html.Attribute msg
+onMove tag =
+    let
+        decoder =
+            decodeWithMovement
+                |> Decode.map tag
+                |> Decode.map options
+
+        options message =
+            { message = message
+            , stopPropagation = False
+            , preventDefault = True
+            }
+    in
+    HtmlEvents.custom "mousemove" decoder
 
 
 
@@ -148,8 +224,8 @@ viewMainSection =
                 , button [ class "btm btm--border" ] [ text "Create" ]
                 ]
             ]
-        , div [ class "main__ctnr" ]
-            [ div [ class "glass-card" ]
+        , div [ class "main__ctnr " ]
+            [ div [ class "glass-card", onMove (.movement >> MouseMove) ]
                 [ img [ class "glass-card__image", src "https://picsum.photos/800" ] []
                 , div [ class "glass-card__bottom gap-2" ]
                     [ img [ class "row-span-2 rounded-[50%] w-14", src "https://picsum.photos/600" ] []

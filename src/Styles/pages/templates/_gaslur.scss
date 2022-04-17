@@ -29,7 +29,7 @@
 	height: 0.125rem;
 	border-radius: var(--radius-round);
 
-	animation: slide-down-fade-in 100ms ease-in-out;
+	animation: slide-down-fade-in 100ms ease-in;
 	@keyframes slide-down-fade-in {
 		0% {
 			opacity: 0;
@@ -176,8 +176,6 @@
 		}
 
 		&__ctnr {
-			// padding: 3rem 0;
-
 			.btm {
 				padding: 0.75rem 2.5rem;
 				border-radius: 0.625rem;
@@ -208,6 +206,7 @@
 		gap: $space;
 
 		padding: $space;
+		margin: 1rem;
 
 		height: 36.5625rem;
 		width: 31.875rem;
