@@ -1,7 +1,7 @@
 module Pages.Template.Gaslur exposing (Model, Msg, page)
 
 import Array exposing (Array)
-import Browser.Dom exposing (Viewport, getViewport)
+import Browser.Dom exposing (Element, Error, Viewport, getViewport)
 import Browser.Events as BrowserEvents
 import Components.Svg as SVG exposing (gaslur)
 import Gen.Params.Home_ exposing (Params)
@@ -65,6 +65,7 @@ page shared req =
 type alias Model =
     { windowViewport : ( Int, Int )
     , mousePosition : { x : Int, y : Int }
+    , cardSize : Maybe { width : Int, height : Int }
     }
 
 
@@ -72,8 +73,13 @@ init : ( Model, Cmd Msg )
 init =
     ( { windowViewport = ( 0, 0 )
       , mousePosition = { x = 0, y = 0 }
+      , cardSize = Nothing
       }
-    , Task.perform GetViewport getViewport
+    , Cmd.batch
+        [ Task.perform GetViewport getViewport
+        , Browser.Dom.getElement "main-card"
+            |> Task.attempt GotCard
+        ]
     )
 
 
@@ -85,6 +91,7 @@ type Msg
     = GetViewport Viewport
     | NewViewport ( Int, Int )
     | MouseMove ( Float, Float )
+    | GotCard (Result Error Element)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -111,6 +118,22 @@ update msg model =
 
         MouseMove ( x, y ) ->
             ( { model | mousePosition = { x = round x, y = round y } }, Cmd.none )
+
+        GotCard checkCard ->
+            case checkCard of
+                Err _ ->
+                    ( { model | cardSize = Nothing }, Cmd.none )
+
+                Ok element ->
+                    ( { model
+                        | cardSize =
+                            Just
+                                { width = round element.element.width
+                                , height = round element.element.height
+                                }
+                      }
+                    , Cmd.none
+                    )
 
 
 
@@ -224,8 +247,8 @@ viewMainSection =
                 , button [ class "btm btm--border" ] [ text "Create" ]
                 ]
             ]
-        , div [ class "main__ctnr " ]
-            [ div [ class "glass-card", onMove (.movement >> MouseMove) ]
+        , div [ class "main__ctnr", id "main-card", onMove (.movement >> MouseMove) ]
+            [ div [ class "glass-card" ]
                 [ img [ class "glass-card__image", src "https://picsum.photos/800" ] []
                 , div [ class "glass-card__bottom gap-2" ]
                     [ img [ class "row-span-2 rounded-[50%] w-14", src "https://picsum.photos/600" ] []
