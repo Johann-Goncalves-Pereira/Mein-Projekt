@@ -33,7 +33,7 @@ import Html
         , text
         , ul
         )
-import Html.Attributes as HA exposing (alt, attribute, class, classList, href, id, src)
+import Html.Attributes as HtmlAttr exposing (alt, attribute, class, classList, href, id, src)
 import Html.Attributes.Aria exposing (ariaLabelledby)
 import Html.Events as HtmlEvents
 import Html.Events.Extra.Mouse as MouseEvents
@@ -41,8 +41,9 @@ import Json.Decode as Decode exposing (Decoder)
 import Page
 import Platform exposing (Task)
 import Request
+import Round
 import Shared
-import Svg.Attributes exposing (display)
+import Svg.Attributes exposing (display, style)
 import Task
 import UI exposing (pageConfig)
 import View exposing (View)
@@ -64,8 +65,8 @@ page shared req =
 
 type alias Model =
     { windowViewport : ( Int, Int )
-    , mousePosition : { x : Int, y : Int }
-    , cardSize : Maybe { width : Int, height : Int }
+    , mousePosition : { x : Float, y : Float }
+    , cardSize : Maybe { width : Float, height : Float }
     }
 
 
@@ -117,7 +118,7 @@ update msg model =
             ( { model | windowViewport = screenUpdate }, Cmd.none )
 
         MouseMove ( x, y ) ->
-            ( { model | mousePosition = { x = round x, y = round y } }, Cmd.none )
+            ( { model | mousePosition = { x = x, y = y } }, Cmd.none )
 
         GotCard checkCard ->
             case checkCard of
@@ -128,8 +129,8 @@ update msg model =
                     ( { model
                         | cardSize =
                             Just
-                                { width = round element.element.width
-                                , height = round element.element.height
+                                { width = element.element.width
+                                , height = element.element.height
                                 }
                       }
                     , Cmd.none
@@ -165,7 +166,7 @@ movementDecoder =
         (Decode.field "movementY" Decode.float)
 
 
-onMove : (EventWithMovement -> msg) -> Html.Attribute msg
+onMove : (EventWithMovement -> Msg) -> Html.Attribute Msg
 onMove tag =
     let
         decoder =
@@ -180,6 +181,96 @@ onMove tag =
             }
     in
     HtmlEvents.custom "mousemove" decoder
+
+
+cardBehavior : Model -> Attribute Msg
+cardBehavior model =
+    case model.cardSize of
+        Nothing ->
+            class ""
+
+        Just cardSize ->
+            let
+                top : Float
+                top =
+                    model.mousePosition.y
+
+                left : Float
+                left =
+                    model.mousePosition.x
+
+                width : Float
+                width =
+                    cardSize.width
+
+                height : Float
+                height =
+                    cardSize.height
+
+                half : Float -> Float
+                half axis =
+                    axis / 2
+
+                correctMousePosition : Float -> Float -> Float
+                correctMousePosition axis size =
+                    if axis < 0 then
+                        0
+
+                    else if axis > size then
+                        size
+
+                    else
+                        axis
+
+                -- half - pos
+                -- x - 0
+                posX : Float
+                posX =
+                    (correctMousePosition left width - width) * -1
+
+                posY : Float
+                posY =
+                    correctMousePosition top height - height
+
+                baseCalc : Float -> Float -> Float
+                baseCalc pos axis =
+                    if pos * 10 / axis < -10 then
+                        -10
+
+                    else if pos * 10 / axis > 10 then
+                        10
+
+                    else
+                        pos * 10 / axis
+
+                --  half - pos
+                -- 10
+                baseDepth : { x : Float, y : Float }
+                baseDepth =
+                    { x = baseCalc posX width
+                    , y = baseCalc posY height
+                    }
+
+                correctDepth : { x : Float, y : Float }
+                correctDepth =
+                    if baseDepth.x * baseDepth.y < 0 then
+                        { x = baseDepth.x * -1, y = baseDepth.y * -1 }
+
+                    else
+                        baseDepth
+
+                depth : { x : String, y : String }
+                depth =
+                    { x = Round.round 2 correctDepth.x
+                    , y = Round.round 2 correctDepth.y
+                    }
+
+                --! How to debug in elm
+                _ =
+                    Debug.log "Depth" ( depth.x, posY )
+            in
+            String.concat [ "transform: rotateX(", depth.y, "deg) rotateY(", depth.x, "deg)" ]
+                |> HtmlAttr.attribute "style"
 
 
 
@@ -211,7 +302,7 @@ textToUpper str =
 viewHeader : Html Msg
 viewHeader =
     header [ class "gaslur__header" ]
-        [ a [ class "gaslur__header__link", HA.href <| Route.toHref Route.Home_ ] [ text "Gaslur" ]
+        [ a [ class "gaslur__header__link", HtmlAttr.href <| Route.toHref Route.Home_ ] [ text "Gaslur" ]
         , nav [ class "nav" ]
             [ a [ class "nav__link nav__link--current", href "#" ] [ textToUpper "Home" ]
             , a [ class "nav__link", href "#" ] [ textToUpper "My profile" ]
@@ -228,15 +319,15 @@ viewHeader =
 viewMain : Model -> Html Msg
 viewMain model =
     main_ [ class "main--gaslur" ]
-        [ viewMainSection
+        [ viewMainSection model
         , viewHotActions model
         , viewGettingStarted
         , viewDiscover model
         ]
 
 
-viewMainSection : Html Msg
-viewMainSection =
+viewMainSection : Model -> Html Msg
+viewMainSection model =
     section [ class "main", ariaLabelledby "heading" ]
         [ header [ class "main__ctnr" ]
             [ h1 [ class "text-7xl tracking-[-2px] mb-5", id "heading" ] [ text "Discover, collect,  and charity in extraordinary NFT marketplace" ]
@@ -248,7 +339,7 @@ viewMainSection =
                 ]
             ]
         , div [ class "main__ctnr", id "main-card", onMove (.movement >> MouseMove) ]
-            [ div [ class "glass-card" ]
+            [ div [ class "glass-card", cardBehavior model ]
                 [ img [ class "glass-card__image", src "https://picsum.photos/800" ] []
                 , div [ class "glass-card__bottom gap-2" ]
                     [ img [ class "row-span-2 rounded-[50%] w-14", src "https://picsum.photos/600" ] []
@@ -340,7 +431,7 @@ hotActionsListContent nItens =
                 [ img [ class "col-span-2 rounded-xl w-full ", src image, alt <| "Made by" ++ author ] []
                 , strong [ class "overflow-hidden text-ellipsis max-w-full whitespace-nowrap" ] [ text author ]
                 , p [ class "font-semibold ml-auto" ] [ text <| String.fromFloat price ++ " Weth" ]
-                , p [ class "item__end-date" ] [ text "Ends in ", Html.time [ HA.datetime <| transformDate endDate ] [ text endDate ] ]
+                , p [ class "item__end-date" ] [ text "Ends in ", Html.time [ HtmlAttr.datetime <| transformDate endDate ] [ text endDate ] ]
                 , button [ class "item__btm font-semibold ml-auto" ] [ text "Bid" ]
                 ]
         )
