@@ -1,19 +1,49 @@
 module Pages.Template.Gaslur exposing (Model, Msg, page)
 
 import Array exposing (Array)
-import Browser.Dom exposing (Viewport, getViewport)
+import Browser.Dom exposing (Element, Error, Viewport, getViewport)
 import Browser.Events as BrowserEvents
 import Components.Svg as SVG exposing (gaslur)
 import Gen.Params.Home_ exposing (Params)
 import Gen.Route as Route
-import Html exposing (Html, a, button, div, em, footer, h1, h2, h3, h4, h5, header, img, li, main_, nav, p, section, small, span, strong, text, ul)
-import Html.Attributes as HA exposing (alt, attribute, class, classList, href, id, src)
+import Html
+    exposing
+        ( Attribute
+        , Html
+        , a
+        , button
+        , div
+        , em
+        , footer
+        , h1
+        , h2
+        , h3
+        , h4
+        , h5
+        , header
+        , img
+        , li
+        , main_
+        , nav
+        , p
+        , section
+        , small
+        , span
+        , strong
+        , text
+        , ul
+        )
+import Html.Attributes as HtmlAttr exposing (alt, attribute, class, classList, href, id, src)
 import Html.Attributes.Aria exposing (ariaLabelledby)
+import Html.Events as HtmlEvents
+import Html.Events.Extra.Mouse as MouseEvents
+import Json.Decode as Decode exposing (Decoder)
 import Page
 import Platform exposing (Task)
 import Request
+import Round
 import Shared
-import Svg.Attributes exposing (display)
+import Svg.Attributes exposing (display, style)
 import Task
 import UI exposing (pageConfig)
 import View exposing (View)
@@ -34,12 +64,24 @@ page shared req =
 
 
 type alias Model =
-    { windowViewport : ( Int, Int ) }
+    { windowViewport : ( Int, Int )
+    , mousePosition : { x : Float, y : Float }
+    , cardSize : Maybe { width : Float, height : Float }
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { windowViewport = ( 0, 0 ) }, Task.perform GetViewport getViewport )
+    ( { windowViewport = ( 0, 0 )
+      , mousePosition = { x = 0, y = 0 }
+      , cardSize = Nothing
+      }
+    , Cmd.batch
+        [ Task.perform GetViewport getViewport
+        , Browser.Dom.getElement "main-card"
+            |> Task.attempt GotCard
+        ]
+    )
 
 
 
@@ -49,6 +91,8 @@ init =
 type Msg
     = GetViewport Viewport
     | NewViewport ( Int, Int )
+    | MouseMove ( Float, Float )
+    | GotCard (Result Error Element)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -73,6 +117,25 @@ update msg model =
         NewViewport screenUpdate ->
             ( { model | windowViewport = screenUpdate }, Cmd.none )
 
+        MouseMove ( x, y ) ->
+            ( { model | mousePosition = { x = x, y = y } }, Cmd.none )
+
+        GotCard checkCard ->
+            case checkCard of
+                Err _ ->
+                    ( { model | cardSize = Nothing }, Cmd.none )
+
+                Ok element ->
+                    ( { model
+                        | cardSize =
+                            Just
+                                { width = element.element.width
+                                , height = element.element.height
+                                }
+                      }
+                    , Cmd.none
+                    )
+
 
 
 -- SUBSCRIPTION
@@ -81,6 +144,126 @@ update msg model =
 subscription : Model -> Sub Msg
 subscription _ =
     BrowserEvents.onResize (\w h -> NewViewport ( w, h ))
+
+
+
+{-
+   type alias EventWithMovement =
+       { mouseEvent : MouseEvents.Event
+       , movement : ( Float, Float )
+       }
+
+
+   decodeWithMovement : Decoder EventWithMovement
+   decodeWithMovement =
+       Decode.map2 EventWithMovement
+           MouseEvents.eventDecoder
+           movementDecoder
+
+
+   movementDecoder : Decoder ( Float, Float )
+   movementDecoder =
+       Decode.map2 (\a b -> ( a, b ))
+           (Decode.field "movementX" Decode.float)
+           (Decode.field "movementY" Decode.float)
+
+
+   onMove : (EventWithMovement -> Msg) -> Html.Attribute Msg
+   onMove tag =
+       let
+           decoder =
+               decodeWithMovement
+                   |> Decode.map tag
+                   |> Decode.map options
+
+           options message =
+               { message = message
+               , stopPropagation = False
+               , preventDefault = True
+               }
+       in
+       HtmlEvents.custom "mousemove" decoder
+-}
+
+
+cardBehavior : Model -> Attribute Msg
+cardBehavior model =
+    case model.cardSize of
+        Nothing ->
+            class ""
+
+        Just cardSize ->
+            let
+                adjustAxis : Float -> Float -> Float
+                adjustAxis axisType posType =
+                    if posType < 0 then
+                        0
+
+                    else if posType > axisType then
+                        axisType
+
+                    else
+                        posType
+
+                top : Float
+                top =
+                    adjustAxis model.mousePosition.y cardSize.height
+
+                left : Float
+                left =
+                    adjustAxis model.mousePosition.x cardSize.width
+
+                width : Float
+                width =
+                    cardSize.width
+
+                height : Float
+                height =
+                    cardSize.height
+
+                origin : { x : Float, y : Float }
+                origin =
+                    { x = (left - width) * -1
+                    , y = top - height
+                    }
+
+                baseDepth : Float
+                baseDepth =
+                    20
+
+                depthCalc : Float -> Float -> Float
+                depthCalc pos half =
+                    -- if pos * baseDepth / (half / 2) < -baseDepth then
+                    --     -baseDepth
+                    -- else if pos * baseDepth / (half / 2) > baseDepth then
+                    --     baseDepth
+                    -- else
+                    pos * baseDepth / half
+
+                depthOrigin : { x : Float, y : Float }
+                depthOrigin =
+                    { x = depthCalc origin.x width
+                    , y = depthCalc origin.y height
+                    }
+
+                depth : { x : String, y : String }
+                depth =
+                    if depthOrigin.x * depthOrigin.y < 0 then
+                        { x = Round.round 2 <| depthOrigin.x * -1
+                        , y = Round.round 2 <| depthOrigin.y * -1
+                        }
+
+                    else
+                        { x = Round.round 2 <| depthOrigin.x
+                        , y = Round.round 2 <| depthOrigin.y
+                        }
+
+                --! How to debug in elm
+                _ =
+                    Debug.log "Depth" ( depth.x, depth.y )
+            in
+            String.concat [ "transform: rotateX(", depth.y, "deg) rotateY(", depth.x, "deg)" ]
+                |> HtmlAttr.attribute "style"
 
 
 
@@ -112,7 +295,7 @@ textToUpper str =
 viewHeader : Html Msg
 viewHeader =
     header [ class "gaslur__header" ]
-        [ a [ class "gaslur__header__link", HA.href <| Route.toHref Route.Home_ ] [ text "Gaslur" ]
+        [ a [ class "gaslur__header__link", HtmlAttr.href <| Route.toHref Route.Home_ ] [ text "Gaslur" ]
         , nav [ class "nav" ]
             [ a [ class "nav__link nav__link--current", href "#" ] [ textToUpper "Home" ]
             , a [ class "nav__link", href "#" ] [ textToUpper "My profile" ]
@@ -129,15 +312,15 @@ viewHeader =
 viewMain : Model -> Html Msg
 viewMain model =
     main_ [ class "main--gaslur" ]
-        [ viewMainSection
+        [ viewMainSection model
         , viewHotActions model
         , viewGettingStarted
         , viewDiscover model
         ]
 
 
-viewMainSection : Html Msg
-viewMainSection =
+viewMainSection : Model -> Html Msg
+viewMainSection model =
     section [ class "main", ariaLabelledby "heading" ]
         [ header [ class "main__ctnr" ]
             [ h1 [ class "text-7xl tracking-[-2px] mb-5", id "heading" ] [ text "Discover, collect,  and charity in extraordinary NFT marketplace" ]
@@ -148,8 +331,8 @@ viewMainSection =
                 , button [ class "btm btm--border" ] [ text "Create" ]
                 ]
             ]
-        , div [ class "main__ctnr" ]
-            [ div [ class "glass-card" ]
+        , div [ class "main__ctnr", id "main-card", MouseEvents.onMove (.offsetPos >> MouseMove) ]
+            [ div [ class "glass-card", cardBehavior model ]
                 [ img [ class "glass-card__image", src "https://picsum.photos/800" ] []
                 , div [ class "glass-card__bottom gap-2" ]
                     [ img [ class "row-span-2 rounded-[50%] w-14", src "https://picsum.photos/600" ] []
@@ -241,7 +424,7 @@ hotActionsListContent nItens =
                 [ img [ class "col-span-2 rounded-xl w-full ", src image, alt <| "Made by" ++ author ] []
                 , strong [ class "overflow-hidden text-ellipsis max-w-full whitespace-nowrap" ] [ text author ]
                 , p [ class "font-semibold ml-auto" ] [ text <| String.fromFloat price ++ " Weth" ]
-                , p [ class "item__end-date" ] [ text "Ends in ", Html.time [ HA.datetime <| transformDate endDate ] [ text endDate ] ]
+                , p [ class "item__end-date" ] [ text "Ends in ", Html.time [ HtmlAttr.datetime <| transformDate endDate ] [ text endDate ] ]
                 , button [ class "item__btm font-semibold ml-auto" ] [ text "Bid" ]
                 ]
         )

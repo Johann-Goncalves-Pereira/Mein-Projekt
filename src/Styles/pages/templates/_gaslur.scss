@@ -19,6 +19,29 @@
 	background: linear-gradient(103.91deg, var(--gaslur-brand-0) 21.01%, var(--gaslur-brand-1) 100%);
 }
 
+@mixin pseudo-underline($px) {
+	$bottom: 0.75rem;
+	content: "";
+	position: absolute;
+	inset-inline: $px + 0.125;
+	bottom: $bottom;
+
+	height: 0.125rem;
+	border-radius: var(--radius-round);
+
+	animation: slide-down-fade-in 100ms ease-in;
+	@keyframes slide-down-fade-in {
+		0% {
+			opacity: 0;
+			transform: translateY(-$bottom);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+}
+
 .root--gaslur {
 	font-family: "Poppins", sans-serif;
 	background-color: var(--gaslur-surface-0);
@@ -73,11 +96,22 @@
 			display: flex;
 
 			&__link {
-				$px: 1.5rem;
-				padding: 1.25rem $px;
+				$padding-x: 1.5rem;
+				padding: 1.25rem $padding-x;
+				color: var(--clr-text-0);
 				font-weight: 500;
+				text-decoration: none;
 
 				@include text-base-config();
+
+				&:hover {
+					position: relative;
+					&::after {
+						@include pseudo-underline($padding-x);
+
+						background-color: aliceblue;
+					}
+				}
 
 				&--current {
 					position: relative;
@@ -85,13 +119,7 @@
 					@include text-gradient-color();
 
 					&::after {
-						content: "";
-						position: absolute;
-						inset-inline: $px + 0.125;
-						bottom: 0.75rem;
-
-						height: 0.125rem;
-						border-radius: var(--radius-round);
+						@include pseudo-underline($padding-x);
 
 						background-color: var(--gaslur-brand-0);
 						background-image: linear-gradient(90deg, var(--gaslur-brand-0) 53%, var(--gaslur-brand-1) 127%);
@@ -148,8 +176,6 @@
 		}
 
 		&__ctnr {
-			// padding: 3rem 0;
-
 			.btm {
 				padding: 0.75rem 2.5rem;
 				border-radius: 0.625rem;
@@ -180,9 +206,13 @@
 		gap: $space;
 
 		padding: $space;
+		margin: 1rem;
 
 		height: 36.5625rem;
 		width: 31.875rem;
+
+		transition: transform 200ms ease-in-out;
+		cursor: default;
 
 		@mixin size($h) {
 			$w: div($h * 31.875, 36.5625);
