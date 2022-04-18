@@ -211,6 +211,9 @@
 		height: 36.5625rem;
 		width: 31.875rem;
 
+		transition: transform 200ms ease-in-out;
+		cursor: default;
+
 		@mixin size($h) {
 			$w: div($h * 31.875, 36.5625);
 

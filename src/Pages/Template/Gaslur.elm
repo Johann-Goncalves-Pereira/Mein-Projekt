@@ -146,41 +146,44 @@ subscription _ =
     BrowserEvents.onResize (\w h -> NewViewport ( w, h ))
 
 
-type alias EventWithMovement =
-    { mouseEvent : MouseEvents.Event
-    , movement : ( Float, Float )
-    }
+
+{-
+   type alias EventWithMovement =
+       { mouseEvent : MouseEvents.Event
+       , movement : ( Float, Float )
+       }
 
 
-decodeWithMovement : Decoder EventWithMovement
-decodeWithMovement =
-    Decode.map2 EventWithMovement
-        MouseEvents.eventDecoder
-        movementDecoder
+   decodeWithMovement : Decoder EventWithMovement
+   decodeWithMovement =
+       Decode.map2 EventWithMovement
+           MouseEvents.eventDecoder
+           movementDecoder
 
 
-movementDecoder : Decoder ( Float, Float )
-movementDecoder =
-    Decode.map2 (\a b -> ( a, b ))
-        (Decode.field "movementX" Decode.float)
-        (Decode.field "movementY" Decode.float)
+   movementDecoder : Decoder ( Float, Float )
+   movementDecoder =
+       Decode.map2 (\a b -> ( a, b ))
+           (Decode.field "movementX" Decode.float)
+           (Decode.field "movementY" Decode.float)
 
 
-onMove : (EventWithMovement -> Msg) -> Html.Attribute Msg
-onMove tag =
-    let
-        decoder =
-            decodeWithMovement
-                |> Decode.map tag
-                |> Decode.map options
+   onMove : (EventWithMovement -> Msg) -> Html.Attribute Msg
+   onMove tag =
+       let
+           decoder =
+               decodeWithMovement
+                   |> Decode.map tag
+                   |> Decode.map options
 
-        options message =
-            { message = message
-            , stopPropagation = False
-            , preventDefault = True
-            }
-    in
-    HtmlEvents.custom "mousemove" decoder
+           options message =
+               { message = message
+               , stopPropagation = False
+               , preventDefault = True
+               }
+       in
+       HtmlEvents.custom "mousemove" decoder
+-}
 
 
 cardBehavior : Model -> Attribute Msg
@@ -191,13 +194,24 @@ cardBehavior model =
 
         Just cardSize ->
             let
+                adjustAxis : Float -> Float -> Float
+                adjustAxis axisType posType =
+                    if posType < 0 then
+                        0
+
+                    else if posType > axisType then
+                        axisType
+
+                    else
+                        posType
+
                 top : Float
                 top =
-                    model.mousePosition.y
+                    adjustAxis model.mousePosition.y cardSize.height
 
                 left : Float
                 left =
-                    model.mousePosition.x
+                    adjustAxis model.mousePosition.x cardSize.width
 
                 width : Float
                 width =
@@ -207,67 +221,46 @@ cardBehavior model =
                 height =
                     cardSize.height
 
-                half : Float -> Float
-                half axis =
-                    axis / 2
-
-                correctMousePosition : Float -> Float -> Float
-                correctMousePosition axis size =
-                    if axis < 0 then
-                        0
-
-                    else if axis > size then
-                        size
-
-                    else
-                        axis
-
-                -- half - pos
-                -- x - 0
-                posX : Float
-                posX =
-                    (correctMousePosition left width - width) * -1
-
-                posY : Float
-                posY =
-                    correctMousePosition top height - height
-
-                baseCalc : Float -> Float -> Float
-                baseCalc pos axis =
-                    if pos * 10 / axis < -10 then
-                        -10
-
-                    else if pos * 10 / axis > 10 then
-                        10
-
-                    else
-                        pos * 10 / axis
-
-                --  half - pos
-                -- 10
-                baseDepth : { x : Float, y : Float }
-                baseDepth =
-                    { x = baseCalc posX width
-                    , y = baseCalc posY height
+                origin : { x : Float, y : Float }
+                origin =
+                    { x = (left - width) * -1
+                    , y = top - height
                     }
 
-                correctDepth : { x : Float, y : Float }
-                correctDepth =
-                    if baseDepth.x * baseDepth.y < 0 then
-                        { x = baseDepth.x * -1, y = baseDepth.y * -1 }
+                baseDepth : Float
+                baseDepth =
+                    20
 
-                    else
-                        baseDepth
+                depthCalc : Float -> Float -> Float
+                depthCalc pos half =
+                    -- if pos * baseDepth / (half / 2) < -baseDepth then
+                    --     -baseDepth
+                    -- else if pos * baseDepth / (half / 2) > baseDepth then
+                    --     baseDepth
+                    -- else
+                    pos * baseDepth / half
+
+                depthOrigin : { x : Float, y : Float }
+                depthOrigin =
+                    { x = depthCalc origin.x width
+                    , y = depthCalc origin.y height
+                    }
 
                 depth : { x : String, y : String }
                 depth =
-                    { x = Round.round 2 correctDepth.x
-                    , y = Round.round 2 correctDepth.y
-                    }
+                    if depthOrigin.x * depthOrigin.y < 0 then
+                        { x = Round.round 2 <| depthOrigin.x * -1
+                        , y = Round.round 2 <| depthOrigin.y * -1
+                        }
+
+                    else
+                        { x = Round.round 2 <| depthOrigin.x
+                        , y = Round.round 2 <| depthOrigin.y
+                        }
 
                 --! How to debug in elm
                 _ =
-                    Debug.log "Depth" ( depth.x, posY )
+                    Debug.log "Depth" ( depth.x, depth.y )
             in
             String.concat [ "transform: rotateX(", depth.y, "deg) rotateY(", depth.x, "deg)" ]
                 |> HtmlAttr.attribute "style"
@@ -338,7 +331,7 @@ viewMainSection model =
                 , button [ class "btm btm--border" ] [ text "Create" ]
                 ]
             ]
-        , div [ class "main__ctnr", id "main-card", onMove (.movement >> MouseMove) ]
+        , div [ class "main__ctnr", id "main-card", MouseEvents.onMove (.offsetPos >> MouseMove) ]
             [ div [ class "glass-card", cardBehavior model ]
                 [ img [ class "glass-card__image", src "https://picsum.photos/800" ] []
                 , div [ class "glass-card__bottom gap-2" ]
