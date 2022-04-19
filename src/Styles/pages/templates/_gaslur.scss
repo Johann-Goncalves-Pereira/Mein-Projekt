@@ -176,6 +176,34 @@
 		}
 
 		&__ctnr {
+			position: relative;
+			:is(&::before, &::after) {
+				$size: 12rem;
+
+				content: "";
+				position: absolute;
+
+				height: $size;
+				width: $size;
+
+				filter: blur(150px);
+				z-index: -3;
+			}
+
+			&::before {
+				top: -3rem;
+				left: -6rem;
+
+				background-color: var(--gaslur-brand-0);
+			}
+
+			&::after {
+				right: -6rem;
+				bottom: -3rem;
+
+				background-color: var(--gaslur-brand-1);
+			}
+
 			.btm {
 				padding: 0.75rem 2.5rem;
 				border-radius: 0.625rem;
@@ -206,12 +234,11 @@
 		gap: $space;
 
 		padding: $space;
-		margin: 1rem;
 
 		height: 36.5625rem;
 		width: 31.875rem;
 
-		transition: transform 200ms ease-in-out;
+		transition: transform 100ms ease-in-out;
 		cursor: default;
 
 		@mixin size($h) {
@@ -230,33 +257,6 @@
 		}
 		backdrop-filter: blur(117px);
 		z-index: 1;
-
-		:is(&::before, &::after) {
-			$size: 12rem;
-
-			content: "";
-			position: absolute;
-
-			height: $size;
-			width: $size;
-
-			filter: blur(150px);
-			z-index: -3;
-		}
-
-		&::before {
-			top: -3rem;
-			left: -6rem;
-
-			background-color: var(--gaslur-brand-0);
-		}
-
-		&::after {
-			right: -6rem;
-			bottom: -3rem;
-
-			background-color: var(--gaslur-brand-1);
-		}
 
 		&__svg {
 			position: absolute;

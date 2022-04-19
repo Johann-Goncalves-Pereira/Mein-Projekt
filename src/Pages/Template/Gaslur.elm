@@ -186,11 +186,11 @@ subscription _ =
 -}
 
 
-cardBehavior : Model -> Attribute Msg
-cardBehavior model =
+depthCard : Model -> { x : String, y : String }
+depthCard model =
     case model.cardSize of
         Nothing ->
-            class ""
+            { x = "0", y = "0" }
 
         Just cardSize ->
             let
@@ -221,52 +221,54 @@ cardBehavior model =
                 height =
                     cardSize.height
 
-                origin : { x : Float, y : Float }
-                origin =
-                    { x = (left - width) * -1
-                    , y = top - height
+                calcPos : Float -> Float -> Float
+                calcPos posType axisType =
+                    posType - axisType / 2
+
+                pos : { x : Float, y : Float }
+                pos =
+                    { x = calcPos left width
+                    , y = calcPos top height
                     }
 
-                baseDepth : Float
-                baseDepth =
-                    20
+                composeDepth : Float -> Float -> Float
+                composeDepth axisType posType =
+                    posType * 15 / (axisType / 2)
 
-                depthCalc : Float -> Float -> Float
-                depthCalc pos half =
-                    -- if pos * baseDepth / (half / 2) < -baseDepth then
-                    --     -baseDepth
-                    -- else if pos * baseDepth / (half / 2) > baseDepth then
-                    --     baseDepth
-                    -- else
-                    pos * baseDepth / half
-
-                depthOrigin : { x : Float, y : Float }
-                depthOrigin =
-                    { x = depthCalc origin.x width
-                    , y = depthCalc origin.y height
-                    }
-
-                depth : { x : String, y : String }
+                depth : { x : Float, y : Float }
                 depth =
-                    if depthOrigin.x * depthOrigin.y < 0 then
-                        { x = Round.round 2 <| depthOrigin.x * -1
-                        , y = Round.round 2 <| depthOrigin.y * -1
-                        }
-
-                    else
-                        { x = Round.round 2 <| depthOrigin.x
-                        , y = Round.round 2 <| depthOrigin.y
-                        }
+                    { x = composeDepth width pos.x
+                    , y = composeDepth height pos.y
+                    }
 
                 --! How to debug in elm
-                _ =
-                    Debug.log "Depth" ( depth.x, depth.y )
+                -- _ =
+                -- Debug.log "Depth" ( depth.x, depth.y )
             in
-            String.concat [ "transform: rotateX(", depth.y, "deg) rotateY(", depth.x, "deg)" ]
-                |> HtmlAttr.attribute "style"
+            if depth.x * depth.y < 0 then
+                { x = Round.round 2 <| depth.x * -1
+                , y = Round.round 2 <| depth.y * -1
+                }
+
+            else
+                { x = Round.round 2 <| depth.x
+                , y = Round.round 2 <| depth.y
+                }
+
+
+transformCard : Model -> Attribute Msg
+transformCard model =
+    let
+        depth : { x : String, y : String }
+        depth =
+            depthCard model
+    in
+    String.concat [ "transform: rotateX(", depth.y, "deg) rotateY(", depth.x, "deg)" ]
+        |> attribute "style"
 
 
 
+-- String.concat [ Round.round 2 pos.x, "(x) : ", Round.round 2 pos.y, "(y)" ]
 -- VIEW
 
 
@@ -321,6 +323,11 @@ viewMain model =
 
 viewMainSection : Model -> Html Msg
 viewMainSection model =
+    let
+        depth : { x : String, y : String }
+        depth =
+            depthCard model
+    in
     section [ class "main", ariaLabelledby "heading" ]
         [ header [ class "main__ctnr" ]
             [ h1 [ class "text-7xl tracking-[-2px] mb-5", id "heading" ] [ text "Discover, collect,  and charity in extraordinary NFT marketplace" ]
@@ -332,7 +339,10 @@ viewMainSection model =
                 ]
             ]
         , div [ class "main__ctnr", id "main-card", MouseEvents.onMove (.offsetPos >> MouseMove) ]
-            [ div [ class "glass-card", cardBehavior model ]
+            [ div
+                [ class "glass-card"
+                , transformCard model
+                ]
                 [ img [ class "glass-card__image", src "https://picsum.photos/800" ] []
                 , div [ class "glass-card__bottom gap-2" ]
                     [ img [ class "row-span-2 rounded-[50%] w-14", src "https://picsum.photos/600" ] []
