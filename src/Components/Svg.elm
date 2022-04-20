@@ -1,6 +1,7 @@
 module Components.Svg exposing (..)
 
 import Html exposing (Html)
+import Html.Attributes as HA
 import Svg
     exposing
         ( circle
@@ -20,7 +21,7 @@ import Svg
         , svg
         , use
         )
-import Svg.Attributes as Sa exposing (..)
+import Svg.Attributes as SA exposing (..)
 
 
 type Gaslur
@@ -37,6 +38,10 @@ type Gaslur
     | Instagram
     | Facebook
     | Twitter
+
+
+type District
+    = Test
 
 
 gaslur : Gaslur -> Html msg
@@ -117,4 +122,22 @@ gaslur svgToUse =
         Twitter ->
             svg [ class "svg-icon", style "width: 2.125rem; height: 2.125rem;vertical-align: middle;fill: currentColor;overflow: hidden;", viewBox "0 0 1024 1024", version "1.1" ]
                 [ Svg.path [ fill "#C4C4C4", d "M363.093333 853.333333h-3.413333a463.786667 463.786667 0 0 1-198.4-46.506666A58.88 58.88 0 0 1 128 745.386667a60.16 60.16 0 0 1 49.493333-50.346667 282.88 282.88 0 0 0 108.373334-37.973333 404.906667 404.906667 0 0 1-149.76-386.986667 60.16 60.16 0 0 1 42.666666-49.066667 57.6 57.6 0 0 1 61.013334 17.493334 302.506667 302.506667 0 0 0 208.213333 117.333333 192 192 0 0 1 60.16-132.266667 190.72 190.72 0 0 1 271.786667 8.106667 29.866667 29.866667 0 0 0 33.28 4.266667A59.306667 59.306667 0 0 1 896 304.213333a284.16 284.16 0 0 1-54.613333 110.933334A460.373333 460.373333 0 0 1 363.093333 853.333333z m0-85.333333h3.413334a375.04 375.04 0 0 0 387.84-366.506667 56.32 56.32 0 0 1 15.786666-36.266666 221.44 221.44 0 0 0 26.453334-42.666667 109.226667 109.226667 0 0 1-81.493334-36.266667A104.533333 104.533333 0 0 0 640 256a106.666667 106.666667 0 0 0-76.373333 29.44 107.946667 107.946667 0 0 0-30.72 103.253333l11.093333 48.64-49.92 3.413334a354.133333 354.133333 0 0 1-279.04-102.4 303.786667 303.786667 0 0 0 159.146667 275.626666l40.533333 23.04-26.88 38.4a239.786667 239.786667 0 0 1-114.346667 81.92A355.84 355.84 0 0 0 362.666667 768zM810.666667 283.733333z" ] []
+                ]
+
+
+district : District -> Html msg
+district svgToUse =
+    case svgToUse of
+        Test ->
+            svg [ width "0", height "0" ]
+                [ defs []
+                    [ Svg.clipPath [ HA.id "clipped" ]
+                        [ circle [ cx "var(--myRad)", cy "var(--myRad)", r "var(--myRad)" ] []
+                        , circle [ cx "var(--myRad)", cy "calc(var(--myHeight) - var(--myRad))", r "var(--myRad)" ] []
+                        , circle [ cx "calc(var(--myWidth) - var(--myRad))", cy "calc(var(--myHeight) - var(--myRad))", r "var(--myRad)" ] []
+                        , circle [ cx "calc(var(--myWidth) - var(--myRad))", cy "var(--myRad)", r "var(--myRad)" ] []
+                        , rect [ y "var(--myRad)", width "var(--myWidth)", height "calc(var(--myHeight) - (2 * var(--myRad)))" ] []
+                        , rect [ x "var(--myRad)", width "calc(var(--myWidth) - (2 * var(--myRad)))", height "var(--myHeight)" ] []
+                        ]
+                    ]
                 ]
