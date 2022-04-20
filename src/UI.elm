@@ -79,6 +79,9 @@ caseNamePage route =
         Route.Template__Gaslur ->
             "Gaslur"
 
+        Route.Template__District ->
+            "District"
+
         Route.NotFound ->
             "Not Found"
 
