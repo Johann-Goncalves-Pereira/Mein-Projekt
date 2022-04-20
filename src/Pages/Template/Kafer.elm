@@ -3,7 +3,7 @@ module Pages.Template.Kafer exposing (Model, Msg, page)
 import Gen.Params.Template.Kafer exposing (Params)
 import Gen.Route as Route
 import Html exposing (Html, a, button, div, h1, header, li, main_, nav, text, ul)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, href)
 import Page
 import Request
 import Shared
@@ -72,7 +72,7 @@ viewPage model =
 viewHeader : Model -> Html Msg
 viewHeader model =
     header [ class "main-header-jd2398" ]
-        [ h1 [ class "title" ] [ text "Käfer" ]
+        [ a [ href <| Route.toHref Route.Home_ ] [ h1 [ class "title" ] [ text "Käfer" ] ]
         , nav [ class "nav" ]
             [ ul [ class "nav__list" ]
                 [ li [ class "nav__list__item" ] [ a [] [ text "About" ] ]

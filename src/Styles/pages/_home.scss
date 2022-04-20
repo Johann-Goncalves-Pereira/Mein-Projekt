@@ -78,6 +78,22 @@
 			padding: 5rem;
 			outline: 1px solid var(--red-6);
 			border-radius: var(--radius-2);
+
+			background-image: var(--bg-url);
+			background-size: var(--bg-size, 120%);
+			background-position: var(--br-position, center);
+
+			&[data-anchor="gaslur"] {
+				--bg-url: url("https://gateway.pinata.cloud/ipfs/QmZc6MVfjPGGNkGWNgEuYwek6PTGPyr8ZuSDGDpwrFzatj");
+			}
+
+			&[data-anchor="kafer"] {
+				--bg-url: url("https://gateway.pinata.cloud/ipfs/QmWCCGdCLKo6rmpuQPNb7QtnP7DAGQTe5V2iz7AMux7snc");
+			}
+			&[data-anchor="district"] {
+				background-color: gold;
+				// --bg-url: url("https://gateway.pinata.cloud/ipfs/QmWCCGdCLKo6rmpuQPNb7QtnP7DAGQTe5V2iz7AMux7snc");
+			}
 		}
 	}
 }

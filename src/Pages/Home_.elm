@@ -73,11 +73,15 @@ viewMain model =
 
 viewTemplates : Model -> Html Msg
 viewTemplates model =
+    let
+        dataType anchor =
+            attribute "data-anchor" anchor
+    in
     section [ class "templates" ]
-        [ a [ class "templates__container col-span-2", href <| Route.toHref Route.Template__Gaslur ] [ text "Gaslur" ]
-        , a [ class "templates__container row-span-2 ", href <| Route.toHref Route.Template__Kafer ] [ text "Käfer" ]
-        , a [ class "templates__container row-span-2", href <| Route.toHref Route.Template__Kafer ] [ text "3" ]
-        , a [ class "templates__container ", href <| Route.toHref Route.Template__Kafer ] [ text "4" ]
-        , a [ class "templates__container col-span-2", href <| Route.toHref Route.Template__Kafer ] [ text "5" ]
-        , a [ class "templates__container col-span-3", href <| Route.toHref Route.Template__Kafer ] [ text "6" ]
+        [ a [ class "templates__container col-span-2", dataType "gaslur", href <| Route.toHref Route.Template__Gaslur ] []
+        , a [ class "templates__container row-span-2 ", dataType "kafer", href <| Route.toHref Route.Template__Kafer ] []
+        , a [ class "templates__container row-span-2", dataType "district", href <| Route.toHref Route.Template__District ] []
+        , a [ class "templates__container ", href <| Route.toHref Route.Template__Kafer ] []
+        , a [ class "templates__container col-span-2", href <| Route.toHref Route.Template__Kafer ] []
+        , a [ class "templates__container col-span-3", href <| Route.toHref Route.Template__Kafer ] []
         ]
